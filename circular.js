@@ -48,20 +48,24 @@ function circleObj(x, y, r, c)
     this.r = r;
     this.c = c;
 
-    this.draw = function()
-    {
+    this.draw = function(){
         draw.circle(this.x, this.y, this.r, this.c);
-    } ;
+    };
 };
 
 /*Text object*/
-/*var testMsg = function(str, x, )
+var textObj = function(word, x, y, size, col)
 {
+    this.word = word;
     this.x = x;
     this.y = y;
     this.size = size;
     this.col = col;
-}*/
+
+    this.draw = function(){
+        draw.text(word, x, y, size, col);
+    }
+}
 
 function getRandomColor() {
     var letters = '0123456789ABCDEF'.split('');
@@ -84,6 +88,11 @@ function getWords(){
 
 function printWords(nrOfWords, wordArr, circleArr){
     var randList = getRadomList(nrOfWords, wordArr.length);
+    var printedWordArr = [];
+
+    //Temp
+    var one = new textObj("Word1", 0, 12, 12, 'black');
+    printedWordArr.push(one);
 
     for(var i=0; i<nrOfWords;i++){
         var word = wordArr[randList[i]];
@@ -96,17 +105,26 @@ function printWords(nrOfWords, wordArr, circleArr){
             for(var j=0;j<circleArr.length;j++){
                 if(textCircleCollision(x, y, word, size, circleArr[j])){
                     //Inside other circle
-                    console.log("collision");
+                    console.log("collision circle");
                     var x = Math.floor(Math.random()*(canvasWidth-ctx.measureText(word).width-size));
                     var y = Math.floor(Math.random()*(canvasHeight-size)+size);
                     j = 0;
                 }
             }
-            draw.text(word, x, y, size, col);
+            for(var k=0;k<printedWordArr.length;k++){
+                if(text2TextIntesecton(x, y, size, word, printedWordArr[k])){
+                    //Inside other text
+                    console.log("collision text");
+                    var x = Math.floor(Math.random()*(canvasWidth-ctx.measureText(word).width-size));
+                    var y = Math.floor(Math.random()*(canvasHeight-size)+size);
+                    k=0;
+                }
+            }
+            var printedWord = new textObj(word, x, y, size, col);
+            printedWordArr.push(printedWord);
+            printedWord.draw();
             break;
         }  
-
-        
     }
     
 };
@@ -148,7 +166,7 @@ function textCircleCollision(x, y, word, size, circle){
     // console.log(cornerDist <= Math.round(Math.pow(circle.r,2)));
     // return(cornerDist <= Math.round(Math.pow(circle.r,2)));
 
-    var closestX = clamp(circle.x, x, x+Math.round(ctx.measureText(word).width));
+    var closestX = clamp(circle.x, x, x+Math.round(ctx.measureText(word).width)+size);
     var closestY = clamp(circle.y, y-size, y);
 
     var distX = circle.x - closestX;
@@ -162,6 +180,18 @@ function textCircleCollision(x, y, word, size, circle){
     }
 
     return false;
+}
+
+function text2TextIntesecton(x, y, size, word, otherWord){
+    var wordWidth = Math.round(ctx.measureText(word).width+size);
+    var wordHight = size;
+    var otherWordWidth = Math.round(ctx.measureText(otherWord.word).width+otherWord.size);
+    var otherWordHight = otherWord.size;
+    // console.log((x+wordWidth)+otherWord.x + (otherWord.x+otherWordWidth)+x + y+(otherWord.y+otherWord.size) + otherWord.y+(y+size));
+    if((x+wordWidth)<otherWord.x || (otherWord.x+otherWordWidth)<x || y<(otherWord.y-otherWord.size) || otherWord.y<(y-size)){
+        return false;
+    }
+    return true;
 }
 
 function clamp(num, min, max) {
@@ -211,7 +241,7 @@ function printCircles(nrOfCircles){
             //new circle
             var circle = new circleObj(x, y, radius, col);
             circleArr.push(circle);
-            draw.circle(x, y, radius, col);
+            circle.draw();
             break;
         }        
     }
