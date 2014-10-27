@@ -51,6 +51,10 @@ function circleObj(x, y, r, c)
     this.draw = function(){
         draw.circle(this.x, this.y, this.r, this.c);
     };
+    this.position = function(x, y){
+        this.x = x;
+        this.y = y;
+    }
 };
 
 /*Text object*/
@@ -78,20 +82,10 @@ function getRandomColor() {
     return color;
 };
 
-/*Get words from textfile in the server-side
-Return: Array with all words*/
-function getWords(){
-    var div = document.getElementById("dom-target");
-    var string = div.textContent;
-    var wordArr = string.split("\n");
-    // console.log(value = "Word list length "+ wordArr.length);
-    return wordArr;
-};
-
-/*Generates a array with randomized values from 1 to maxElements*/
+/*Generates a array with randomized values from 0 to maxElements*/
 function getRadomList(maxElements){
     var arr = [];
-    for(var i=1;i<maxElements;i++){
+    for(var i=0;i<maxElements;i++){
         arr.push(i);
     }
     return shuffle(arr);
@@ -109,6 +103,27 @@ function clamp(num, min, max) {
     return num < min ? min : (num > max ? max : num);
 };
 /////////////////////////////////////////////////////////////////////////
+
+//////////////////////////// Get data ////////////////////////////
+/*Get words from textfile in the server-side
+Return: Array with all words*/
+function getWords(){
+    var div = document.getElementById("dom-words");
+    var wordArr = JSON.parse(div.textContent);
+    // console.log(wordArr[0]);
+    // console.log(value = "Word list length "+ wordArr.length);
+    return wordArr;
+};
+
+function getAnsweres(){
+    var div = document.getElementById("dom-answeres");
+    var answareArr = JSON.parse(div.textContent);
+    console.log(answareArr[0]);
+    // console.log(value = "Word list length "+ wordArr.length);
+    return answareArr;
+}
+
+//////////////////////////////////////////////////////////////////
 
 
 //////////////////////////// Print functions ////////////////////////////
@@ -173,6 +188,7 @@ function printWords(nrOfWords, wordArr, circleArr){
 return array with reference to the circles.
 Params: nrOfCircles number of circles that are to be printed*/
 function printCircles(nrOfCircles){
+    var circleFactor  = 4;
     var circleArr = [];
 
     //Answare circle;
@@ -181,7 +197,7 @@ function printCircles(nrOfCircles){
     c.draw();
 
     for(var i=0; i<nrOfCircles-1; i++){
-        var radius = Math.floor(Math.random()*6)*2*Math.PI+4*Math.PI;
+        var radius = Math.floor(Math.random()*6)*2*circleFactor+4*circleFactor;
         var x = Math.floor(Math.random()*(canvasWidth-2*radius)+radius);
         var y = Math.floor(Math.random()*(canvasHeight-2*radius)+radius);
         var col = getRandomColor();
@@ -307,6 +323,7 @@ function onMauseClick(event){
 
 //////////////////////////// Main scope ////////////////////////////
 var wordArr = getWords();
+var answereArr = getAnsweres();
 var allCircles = printCircles(5);
 printWords(5, wordArr, allCircles);
 

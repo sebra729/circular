@@ -1,11 +1,34 @@
 <!DOCTYPE HTML>
 <html lang="en">
 
-<div id="dom-target" style="display: none;">
+<!-- Dom container for the words -->
+<div id="dom-words" style="display: none;">
+  
   <?php
       include_once("filehandeler.php");
-      $wordArr = readWords("words.txt");
-      echo $wordArr;
+      $wordArr = readWords("worrds.txt");
+      if($wordArr){
+        echo $wordArr;
+      }else{
+        $nullWord = array_fill(0, 9, 'NoWord');
+        echo json_encode($nullWord);
+      }
+      
+  ?>
+</div>
+
+<!-- Dom container for the answers -->
+<div id="dom-answeres" style="display: none;">
+  <?php
+      include_once("filehandeler.php");
+      $answereArr = readJSON("answeres.txt");
+      if($answereArr){
+        echo $answereArr;
+      }else{
+        $nullAnswere["answare"] = "Choose Black";
+        $nullAnswere["color"] = "#000000";
+        echo json_encode($nullAnswere);
+      }
   ?>
 </div>
 

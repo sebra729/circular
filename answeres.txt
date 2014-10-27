@@ -1,0 +1,26 @@
+[
+{
+"answare": "Choose Red",
+"color": "#FF0000"
+},
+{
+"answare": "Choose Green",
+"color": "#009933"
+},
+{
+"answare": "Choose Blue",
+"color": "#000066"
+},
+{
+"answare": "Choose Brown",
+"color": "#663300"
+},
+{
+"answare": "Choose Black",
+"color": "#000000"
+},
+{
+"answare": "Choose Yellow",
+"color": "#FFFF00"
+}
+]
