@@ -86,11 +86,18 @@ function getWords(){
     return wordArr;
 };
 
+
+/*Print out the words 
+Checks for intersaction with circles and other text
+Params: nrOfWords, the number of random word. 
+wordArr, array with words. circleArr array with reference to the circles
+
+TODO: clean!!*/
 function printWords(nrOfWords, wordArr, circleArr){
-    var randList = getRadomList(nrOfWords, wordArr.length);
+    var randList = getRadomList(wordArr.length);
     var printedWordArr = [];
 
-    //Temp
+    /*TODO: This should be the answare circle*/
     var one = new textObj("Word1", 0, 12, 12, 'black');
     printedWordArr.push(one);
 
@@ -118,6 +125,16 @@ function printWords(nrOfWords, wordArr, circleArr){
                     var x = Math.floor(Math.random()*(canvasWidth-ctx.measureText(word).width-size));
                     var y = Math.floor(Math.random()*(canvasHeight-size)+size);
                     k=0;
+
+                    for(var j=0;j<circleArr.length;j++){
+                        if(textCircleCollision(x, y, word, size, circleArr[j])){
+                            //Inside other circle
+                            console.log("collision circle");
+                            var x = Math.floor(Math.random()*(canvasWidth-ctx.measureText(word).width-size));
+                            var y = Math.floor(Math.random()*(canvasHeight-size)+size);
+                            j = 0;
+                        }
+                    }
                 }
             }
             var printedWord = new textObj(word, x, y, size, col);
@@ -126,10 +143,10 @@ function printWords(nrOfWords, wordArr, circleArr){
             break;
         }  
     }
-    
 };
 
-function getRadomList(nrOfElements, maxElements){
+/**/
+function getRadomList(maxElements){
     var arr = [];
     for(var i=1;i<maxElements;i++){
         arr.push(i);
@@ -137,35 +154,17 @@ function getRadomList(nrOfElements, maxElements){
     return shuffle(arr);
 };
 
+/*Help function to suffle elements in an array*/
 function shuffle(o){ //v1.0
     for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
     return o;
 };
 
+/*Check if text and circle intersact
+Return boolean
+TODO: Need testing, Text can still be placed within a circle.  
+*/
 function textCircleCollision(x, y, word, size, circle){
-
-    // // ctx.font = 'bold ' + size + 'px monospace';
-    // var texWidth = Math.round(ctx.measureText(word).width);
-    // // console.log("Text width" + texWidth);
-    // var textHight = size;
-
-    // var circleDistX = Math.round(Math.abs(circle.x - x + texWidth/2));
-    // var circleDistY = Math.round(Math.abs(circle.y - y - textHight/2));
-    // // console.log("before compare " + circleDistX + " " + circleDistY + " " + Math.round(texWidth/2 + circle.r) 
-    // //     + " " + Math.round(textHight/2 + circle.r) + " " + Math.round(Math.pow(circleDistX-texWidth/2,2)+Math.pow(circleDistY-textHight/2, 2))
-    // //     + " " + Math.round(Math.pow(circle.r,2)));
-
-    // if(circleDistX > Math.round(texWidth/2 + circle.r)) {return false;};
-    // if(circleDistY > Math.round(textHight/2 + circle.r)) {return false;};
-
-    // if(circleDistX <= Math.round(texWidth/2)) {return true};
-    // if(circleDistY <= Math.round(textHight/2)) {return true};
-
-    // cornerDist = Math.round(Math.pow(circleDistX-texWidth/2,2)+Math.pow(circleDistY-textHight/2, 2));
-
-    // console.log(cornerDist <= Math.round(Math.pow(circle.r,2)));
-    // return(cornerDist <= Math.round(Math.pow(circle.r,2)));
-
     var closestX = clamp(circle.x, x, x+Math.round(ctx.measureText(word).width)+size);
     var closestY = clamp(circle.y, y-size, y);
 
@@ -182,6 +181,8 @@ function textCircleCollision(x, y, word, size, circle){
     return false;
 }
 
+/*Checks if text intersect with other text
+Retunrs boolean*/
 function text2TextIntesecton(x, y, size, word, otherWord){
     var wordWidth = Math.round(ctx.measureText(word).width+size);
     var wordHight = size;
