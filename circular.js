@@ -167,9 +167,10 @@ function getAnswers(){
 //////////////////////////// Print functions ////////////////////////////
 /*Print out the words 
 Checks for intersaction with circles and other text
-Params: nrOfWords, the number of random word. 
-wordArr, array with words. circleArr array with reference to the circles
-TODO: clean!!*/
+Params: nrOfWords, the number of word to be visable. 
+wordArr, array with words. 
+answer, the anwer ext and color. 
+circleArr array with reference to the circles*/
 function printWords(nrOfWords, wordArr, answer, circleArr){
     var randList = getRadomList(wordArr.length);
     var printedWordArr = [];
@@ -336,30 +337,49 @@ function onMauseClick(event){
         hiScore = score;
     }
     console.log("score" + score);
+
+    buildScene(event.target.wordArr, event.target.answerArr)
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
+function buildScene(wordArr, answerArr){
+    draw.clear();
+
+    draw.text('Score: '+score, 0, 12, 12, 'black');
+    draw.text('Hi: '+hiScore, 260, 12, 12, 'black');
+
+    
+
+    //allCircles global array containg all printed circles.
+    if(answerArr.length >0){
+        var rand = Math.floor(Math.random()*answerArr.length);
+        allCircles = printCircles(5, answerArr[rand].color);
+        var printedWordArr = printWords(5, wordArr, answerArr[rand], allCircles);
+    }else{
+        allCircles = printCircles(5, answerArr.color);
+        var printedWordArr = printWords(5, wordArr, answerArr, allCircles);
+    }
+    
+}
 
 //////////////////////////// Main scope ////////////////////////////
-draw.text('Score: '+score, 0, 12, 12, 'black');
-draw.text('Hi: '+hiScore, 260, 20, 12, 'black');
 
 var wordArr = getWords();
 var answerArr = getAnswers();
 
-if(answerArr.length > 0){
-    var randList = getRadomList(answerArr.length);
-    var answer = answerArr[randList[0]];
-}else{
-     var answer = answerArr;
-}
+// if(answerArr.length > 0){
+//     var randList = getRadomList(answerArr.length);
+// }else{
+//     var randList = undefined;
+// }
 
-
-allCircles = printCircles(5, answer.color);
-var printedWordArr = printWords(5, wordArr, answer, allCircles);
+buildScene(wordArr, answerArr);
 
 canvas.addEventListener("mousedown", onMauseClick, false);
+canvas.wordArr = wordArr;
+canvas.answerArr = answerArr;
+canvas.answerArr = randList;
 
 // c = new circleObj(30, 30, 10*3.14, 'red');
 // c.draw();

@@ -21,7 +21,7 @@
 <div id="dom-answers" style="display: none;">
   <?php
       include_once("filehandeler.php");
-      $answerArr = readJSON("answeers.txt");
+      $answerArr = readJSON("answers.txt");
       if($answerArr){
         echo $answerArr;
       }else{
