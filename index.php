@@ -44,10 +44,6 @@
 <body>
   <div id="gameView">
     <canvas id="gameCanvas"></canvas>
-    <div class="controls">
-      <a href="#" id="leftButton">&laquo;</a>
-      <a href="#" id="rightButton">&raquo;</a>
-    </div>
   </div>
 
   <script type="text/javascript" src="circular.js"> </script>
