@@ -18,8 +18,6 @@ function readJSON($fileName)
 	if(file_exists($fileName))
 	{
 		$string = file_get_contents($fileName);
-		// $string = explode("\r\n", $string);
-		// return json_encode($string);
 		return $string;
 	}
 	else{

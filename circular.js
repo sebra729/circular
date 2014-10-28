@@ -349,40 +349,48 @@ function getPosition(event){
 function onMauseClick(event){
 
     var pos = getPosition(event);
-    console.log("x: " + pos.x + " y: " +pos.y);
+    var state = event.target.state;
 
-    /*First element in allCircles containes the right answer*/
-    for(var i=0; i<allCircles.length; i++){
-        if (Math.pow(pos.x - allCircles[i].x, 2)+Math.pow(pos.y-allCircles[i].y,2)<Math.pow(allCircles[i].r,2)) 
-        {
-            if(i==0){
-                score += 1;
-                laps--;
-                if(laps == 0){
+    if(state == 1){
+        var startButton = event.target.startButton;
+        if (Math.pow(pos.x - startButton.x, 2)+Math.pow(pos.y-startButton.y,2)<Math.pow(startButton.r,2)){
+            buildGameScene(event.target.wordArr, event.target.answerArr);
+            canvas.state = 2;
+        }
+    }else if(state == 2){
+        /*First element in allCircles containes the right answer*/
+        for(var i=0; i<allCircles.length; i++){
+            if (Math.pow(pos.x - allCircles[i].x, 2)+Math.pow(pos.y-allCircles[i].y,2)<Math.pow(allCircles[i].r,2)) 
+            {
+                if(i==0){
+                    score += 1;
+                    if (score > hiScore) {
+                        hiScore = score;
+                    }
+                    laps--;
+                    console.log("Laps: " + laps);
+                    if(laps == 0){
+                          canvas.startButton = buildGameOverScreen();
+                          break;    
+                    }
 
+                    buildGameScene(event.target.wordArr, event.target.answerArr);
+                    break;
+                }else{
+                    draw.circle(allCircles[i].x, allCircles[i].y, allCircles[i].r-1, 'white');
+                    score -= 1;
                 }
-                buildScene(event.target.wordArr, event.target.answerArr);
-                break;
-            }else{
-                draw.circle(allCircles[i].x, allCircles[i].y, allCircles[i].r-1, 'white');
-                score -= 1;
             }
-            
         }
-
-        if (score > hiScore) 
-        {
-            hiScore = score;
-        }
-        console.log("score" + score);
-    }   
+    }
+    
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-/*bilds the scene with circles and words 
-chooses randomly which answer to print*/
-function buildScene(wordArr, answerArr){
+/*Builds the scene with circles and words. 
+Chooses randomly which answer to print*/
+function buildGameScene(wordArr, answerArr){
     draw.clear();
 
     draw.text('Score: '+score, 0, 12, 12, 'black');
@@ -397,36 +405,72 @@ function buildScene(wordArr, answerArr){
         allCircles = printCircles(5, answerArr.color);
         var printedWordArr = printWords(5, wordArr, answerArr, allCircles);
     }
-    
 }
 
-function welcomeScreen(){
+/*Builds the welcome 
+Return: circleObj*/
+function buildWelcomeScreen(){
     draw.clear();
 
     var size = 40;
     ctx.font = 'bold ' + size + 'px monospace';
-    draw.text('Welcome!', Math.round(canvasWidth/2-ctx.measureText("Welcome!").width/2),  Math.round(canvasHeight/3), 'black');
+    draw.text('Welcome!', Math.round(canvasWidth/2-ctx.measureText("Welcome!").width/2),  Math.round(canvasHeight/4), size,  getRandomColor());
 
     var msg = "In the game you shold look for a text message like (Choose Red) when you" 
     size = 12;
-    draw.text(msg, 10, Math.round(canvasHeight/3)*2, size, 'black');
+    draw.text(msg, 10, Math.round(canvasHeight/2), size, 'black');
     msg = "have found it you should click the circle with the same color as the text.";
-    draw.text(msg, 10, Math.round(canvasHeight/3)*2+size, size, 'black');
+    draw.text(msg, 10, Math.round(canvasHeight/2)+size, size, 'black');
+
+    var start = new circleObj(canvasWidth/2, Math.round(canvasHeight/4*3), 60, getRandomColor());
+    start.draw();
+    // draw.circle(canvasWidth/2, Math.round(canvasHeight/4*3), 60, 'black');
+
+    size = 40;
+    ctx.font = 'bold ' + size + 'px monospace';
+    draw.text("Start", Math.round(canvasWidth/2-ctx.measureText("Start").width/2),  Math.round(canvasHeight/4*3+size/3), size, getRandomColor())
+
+    return start;
 } 
+
+function buildGameOverScreen(){
+    draw.clear();
+
+    var size = 40;
+    ctx.font = 'bold ' + size + 'px monospace';
+    draw.text('GAME OVER', Math.round(canvasWidth/2-ctx.measureText("GAME OVER").width/2),  Math.round(canvasHeight/4), size, getRandomColor());
+
+    draw.text('Your score: '+score, Math.round(canvasWidth/2-ctx.measureText("Your score:  ").width/2),  Math.round(canvasHeight/2), size, getRandomColor());
+
+    var restart = new circleObj(canvasWidth/2, Math.round(canvasHeight/4*3), 60, getRandomColor());
+    restart.draw();
+
+    size = 25;
+    ctx.font = 'bold ' + size + 'px monospace';
+    draw.text("Restart", Math.round(canvasWidth/2-ctx.measureText("Restart").width/2),  Math.round(canvasHeight/4*3+size/3), size, 'black')
+
+    score = 0;
+    canvas.state = 1;
+    laps = 5;
+    return restart;
+}
 
 //////////////////////////// Main scope ////////////////////////////
 
 var wordArr = getWords();
 var answerArr = getAnswers();
+var state = 1;
 
 
+// gameScreen(wordArr, answerArr);
+var startButton = buildWelcomeScreen();
 
-buildScene(wordArr, answerArr);
-// welcomeScreen();
 
 canvas.addEventListener("mouseup", onMauseClick, false);
 canvas.wordArr = wordArr;
 canvas.answerArr = answerArr;
+canvas.state = state;
+canvas.startButton = startButton;
 
 // c = new circleObj(30, 30, 10*3.14, 'red');
 // c.draw();
