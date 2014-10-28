@@ -6,7 +6,7 @@
   
   <?php
       include_once("filehandeler.php");
-      $wordArr = readWords("worrds.txt");
+      $wordArr = readWords("words.txt");
       if($wordArr){
         echo $wordArr;
       }else{
@@ -18,16 +18,16 @@
 </div>
 
 <!-- Dom container for the answers -->
-<div id="dom-answeres" style="display: none;">
+<div id="dom-answers" style="display: none;">
   <?php
       include_once("filehandeler.php");
-      $answereArr = readJSON("answeres.txt");
-      if($answereArr){
-        echo $answereArr;
+      $answerArr = readJSON("answeers.txt");
+      if($answerArr){
+        echo $answerArr;
       }else{
-        $nullAnswere["answare"] = "Choose Black";
-        $nullAnswere["color"] = "#000000";
-        echo json_encode($nullAnswere);
+        $nullAnswer["answer"] = "Choose Black";
+        $nullAnswer["color"] = "#000000";
+        echo json_encode($nullAnswer);
       }
   ?>
 </div>
