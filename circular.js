@@ -2,9 +2,10 @@
     var canvas = document.getElementById('gameCanvas'),
         ctx = canvas.getContext('2d'),
         score = 0,
-		canvasWidth = Math.PI*150,
-        canvasHeight = Math.PI*150,
+		canvasWidth = 500,
+        canvasHeight = 400,
         hiScore = 20,
+        laps=5,
         leftButton = document.getElementById('leftButton'),
         rightButton = document.getElementById('rightButton');
 
@@ -107,13 +108,17 @@ function clamp(num, min, max) {
 Return x any y coordinates*/
 function getTextPosition(word, printedWordArr, size, circleArr){
     var pos = getTextPositionOutOfCircles(word, size, circleArr);
-
+    var stop = 0;
     for(var k=0;k<printedWordArr.length;k++){
         if(text2TextIntesecton(pos.x, pos.y, size, word, printedWordArr[k])){
             //Inside other text
             console.log("collision text2text");
             k = -1;
             pos = getTextPositionOutOfCircles(word, size, circleArr);
+            stop++;
+            if(stop >= 50){
+                break;
+            };
         }
     }
     return {x: pos.x, y: pos.y};
@@ -124,16 +129,20 @@ Return x any y coordinates*/
 function getTextPositionOutOfCircles(word, size, circleArr){
     //To get the proper width of the text. 
     ctx.font = 'bold ' + size + 'px monospace';
-    var x = Math.floor(Math.random()*(canvasWidth-ctx.measureText(word).width-size));
+    var x = Math.floor(Math.random()*(canvasWidth-ctx.measureText(word).width));
     var y = Math.floor(Math.random()*(canvasHeight-size)+size);
-
+    var stop = 0;
     for(var j=0;j<circleArr.length;j++){
         if(text2CircleIntersection(x, y, word, size, circleArr[j])){
             //Inside other circle
             console.log("collision text2circle");
-            var x = Math.floor(Math.random()*(canvasWidth-ctx.measureText(word).width-size));
+            var x = Math.floor(Math.random()*(canvasWidth-ctx.measureText(word).width));
             var y = Math.floor(Math.random()*(canvasHeight-size)+size);
             j = -1;
+            stop++;
+            if(stop >= 50){
+                break;
+            }
         }
     }
     return {x: x, y: y};
@@ -217,9 +226,21 @@ function printCircles(nrOfCircles, answerColor){
         radius = Math.floor(Math.random()*6)*2*circleFactor+4*circleFactor;
         x = Math.floor(Math.random()*(canvasWidth-2*radius)+radius);
         y = Math.floor(Math.random()*(canvasHeight-2*radius)+radius);
-        var col = getRandomColor();
+        
+        /*Keeps the color of the answere unique*/
+        while(true){
+            var col = getRandomColor();
+            var stop = 0;
+            if(col !== answerColor){
+                break;
+            }else if(stop >= 50){
+                break;
+            }
+            stop++;
+        }
 
         while(true){
+            var stop = 0;
             for(var j=0;j<circleArr.length;j++){
                 if(circle2CircleIntersection(x, y, radius, circleArr[j])){
                     //Circle intersect 
@@ -228,6 +249,10 @@ function printCircles(nrOfCircles, answerColor){
                     y = Math.floor(Math.random()*(canvasHeight-2*radius)+radius);
                     // To get j back to 0 if collision.
                     j = -1;
+                    stop ++;
+                }
+                if(stop >= 50){
+                    break;
                 }
             }
             //new circle
@@ -279,8 +304,8 @@ function text2TextIntesecton(x, y, size, word, otherWord){
     return true;
 }
 
-/*Cecks if a cicle colides whitin an other circle
-TODO: Check if circle is inside the other cicle --Done
+/*Cecks if a circle colides whitin an other circle
+TODO: Check if circle is inside the other circle --Done
 TODO: Test 
 http://math.stackexchange.com/questions/275514/two-circles-overlap*/
 function circle2CircleIntersection(x, y, radius, otherCircle){
@@ -327,35 +352,47 @@ function onMauseClick(event){
     console.log("x: " + pos.x + " y: " +pos.y);
 
     /*First element in allCircles containes the right answer*/
-    if (Math.pow(pos.x - allCircles[0].x, 2)+Math.pow(pos.y-allCircles[0].y,2)<Math.pow(allCircles[0].r,2)) 
-    {
-        score += 1;
-    }
+    for(var i=0; i<allCircles.length; i++){
+        if (Math.pow(pos.x - allCircles[i].x, 2)+Math.pow(pos.y-allCircles[i].y,2)<Math.pow(allCircles[i].r,2)) 
+        {
+            if(i==0){
+                score += 1;
+                laps--;
+                if(laps == 0){
 
-    if (score > hiScore) 
-    {
-        hiScore = score;
-    }
-    console.log("score" + score);
+                }
+                buildScene(event.target.wordArr, event.target.answerArr);
+                break;
+            }else{
+                draw.circle(allCircles[i].x, allCircles[i].y, allCircles[i].r-1, 'white');
+                score -= 1;
+            }
+            
+        }
 
-    buildScene(event.target.wordArr, event.target.answerArr)
+        if (score > hiScore) 
+        {
+            hiScore = score;
+        }
+        console.log("score" + score);
+    }   
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
+/*bilds the scene with circles and words 
+chooses randomly which answer to print*/
 function buildScene(wordArr, answerArr){
     draw.clear();
 
     draw.text('Score: '+score, 0, 12, 12, 'black');
-    draw.text('Hi: '+hiScore, 260, 12, 12, 'black');
-
-    
+    draw.text('Hi: '+hiScore, canvasWidth-ctx.measureText('Hi:    ').width, 12, 12, 'black');
 
     //allCircles global array containg all printed circles.
     if(answerArr.length >0){
         var rand = Math.floor(Math.random()*answerArr.length);
-        allCircles = printCircles(5, answerArr[rand].color);
-        var printedWordArr = printWords(5, wordArr, answerArr[rand], allCircles);
+        allCircles = printCircles(10, answerArr[rand].color);
+        var printedWordArr = printWords(10, wordArr, answerArr[rand], allCircles);
     }else{
         allCircles = printCircles(5, answerArr.color);
         var printedWordArr = printWords(5, wordArr, answerArr, allCircles);
@@ -363,23 +400,33 @@ function buildScene(wordArr, answerArr){
     
 }
 
+function welcomeScreen(){
+    draw.clear();
+
+    var size = 40;
+    ctx.font = 'bold ' + size + 'px monospace';
+    draw.text('Welcome!', Math.round(canvasWidth/2-ctx.measureText("Welcome!").width/2),  Math.round(canvasHeight/3), 'black');
+
+    var msg = "In the game you shold look for a text message like (Choose Red) when you" 
+    size = 12;
+    draw.text(msg, 10, Math.round(canvasHeight/3)*2, size, 'black');
+    msg = "have found it you should click the circle with the same color as the text.";
+    draw.text(msg, 10, Math.round(canvasHeight/3)*2+size, size, 'black');
+} 
+
 //////////////////////////// Main scope ////////////////////////////
 
 var wordArr = getWords();
 var answerArr = getAnswers();
 
-// if(answerArr.length > 0){
-//     var randList = getRadomList(answerArr.length);
-// }else{
-//     var randList = undefined;
-// }
+
 
 buildScene(wordArr, answerArr);
+// welcomeScreen();
 
-canvas.addEventListener("mousedown", onMauseClick, false);
+canvas.addEventListener("mouseup", onMauseClick, false);
 canvas.wordArr = wordArr;
 canvas.answerArr = answerArr;
-canvas.answerArr = randList;
 
 // c = new circleObj(30, 30, 10*3.14, 'red');
 // c.draw();
