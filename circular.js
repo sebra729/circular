@@ -56,8 +56,8 @@ function circleObj(x, y, r, c)
         this.x = x;
         this.y = y;
     }
-    this.rePaint = function(color){
-        draw.circle(this.x, this.y, this.r, color);
+    this.rePaint = function(radius, color){
+        draw.circle(this.x, this.y, radius, color);
     }
 };
 
@@ -354,14 +354,28 @@ function onMouseClick(event){
     var clock = new Date();
     var time = event.target.time;
 
-    if(state == 1){
-        var startButton = event.target.startButton;
-        if (Math.pow(pos.x - startButton.x, 2)+Math.pow(pos.y-startButton.y,2)<Math.pow(startButton.r,2)){
-            buildGameScene(event.target.wordArr, event.target.answerArr);
-            canvas.time = clock.getTime();
-            canvas.state = 2;
+    if(state == 1 || state == 10){
+        var startButtons = event.target.startButtons;
+        for(var i=0;i<startButtons.length;i++){
+            if (Math.pow(pos.x - startButtons[i].x, 2)+Math.pow(pos.y-startButtons[i].y,2)<Math.pow(startButtons[i].r,2)){
+                buildGameScene(event.target.wordArr, event.target.answerArr);
+                canvas.time = clock.getTime();
+                
+                switch(i){
+                    case 0:
+                        canvas.state = 2;
+                        break;
+                    case 1:
+                        canvas.state = 3;
+                        break;
+                    case 2:
+                        canvas.state = 2;
+                        break;
+                }
+                // break;
+            }
         }
-    }else if(state == 2){
+    }else if(state == 2 || state == 3){
         /*Loop thru the circles to determine which was clicked upon*/
         for(var i=0; i<allCircles.length; i++){
             if (Math.pow(pos.x - allCircles[i].x, 2)+Math.pow(pos.y-allCircles[i].y,2)<Math.pow(allCircles[i].r,2)) 
@@ -380,7 +394,9 @@ function onMouseClick(event){
                     /***********************************************/
 
                     laps--;
+                    console.log(laps);
                     if(laps == 0){
+                        canvas.state = 10;
                         canvas.startButton = buildGameOverScreen();
                         break;    
                     }
@@ -424,26 +440,15 @@ function buildGameScene(wordArr, answerArr){
 Return: circleObj*/
 function buildWelcomeScreen(){
     draw.clear();
-
-    var size = 40;
-    ctx.font = 'bold ' + size + 'px monospace';
-    draw.text('Welcome!', Math.round(canvasWidth/2-ctx.measureText("Welcome!").width/2),  Math.round(canvasHeight/4), size,  getRandomColor());
-
+    
     var msg = "In the game you shold look for a text message like (Choose Red) when you" 
     size = 12;
     draw.text(msg, 10, Math.round(canvasHeight/2), size, 'black');
     msg = "have found it you should click the circle with the same color as the text.";
     draw.text(msg, 10, Math.round(canvasHeight/2)+size, size, 'black');
 
-    var start = new circleObj(canvasWidth/2, Math.round(canvasHeight/4*3), 60, getRandomColor());
-    start.draw();
-    // draw.circle(canvasWidth/2, Math.round(canvasHeight/4*3), 60, 'black');
-
-    size = 40;
-    ctx.font = 'bold ' + size + 'px monospace';
-    draw.text("Start", Math.round(canvasWidth/2-ctx.measureText("Start").width/2),  Math.round(canvasHeight/4*3+size/3), size, getRandomColor())
-
-    return start;
+    var buttonArr = buildButtons();
+    return buttonArr;
 } 
 
 /*Builds the game over screen
@@ -451,25 +456,45 @@ Retunr: circleObj*/
 function buildGameOverScreen(){
     draw.clear();
 
-    var size = 40;
+    var size = 40
     ctx.font = 'bold ' + size + 'px monospace';
-    draw.text('GAME OVER', Math.round(canvasWidth/2-ctx.measureText("GAME OVER").width/2),  Math.round(canvasHeight/4), size, getRandomColor());
-
     draw.text('Your score: '+score, Math.round(canvasWidth/2-ctx.measureText("Your score:  ").width/2),  Math.round(canvasHeight/2), size, getRandomColor());
 
-    var restart = new circleObj(canvasWidth/2, Math.round(canvasHeight/4*3), 60, getRandomColor());
-    restart.draw();
-
-    size = 25;
-    ctx.font = 'bold ' + size + 'px monospace';
-    draw.text("Restart", Math.round(canvasWidth/2-ctx.measureText("Restart").width/2),  Math.round(canvasHeight/4*3+size/3), size, 'black')
+    var buttonArr = buildButtons();
 
     score = 0;
-    canvas.state = 1;
     laps = 5;
-    return restart;
+    return buttonArr;
 }
 
+/*Build the game start buttons
+Return array of circleObj*/
+function buildButtons(){
+    var buttonArr = [];
+
+    var start = new circleObj(canvasWidth/2, Math.round(canvasHeight/4*3), 60, getRandomColor());
+    buttonArr.push(start);
+    start.draw();
+    size = 30;
+    ctx.font = 'bold ' + size + 'px monospace';
+    draw.text("OrgiN", Math.round(canvasWidth/2-ctx.measureText("OrgiN").width/2),  Math.round(canvasHeight/4*3+size/3), size, getRandomColor())
+
+    var start2 = new circleObj(canvasWidth/4, Math.round(canvasHeight/4*3), 60, getRandomColor());
+    buttonArr.push(start2);
+    start2.draw();
+    size = 30;
+    ctx.font = 'bold ' + size + 'px monospace';
+    draw.text("GroW", Math.round(canvasWidth/4-ctx.measureText("GroW").width/2),  Math.round(canvasHeight/4*3+size/3), size, getRandomColor())
+
+    var start3 = new circleObj(canvasWidth/4*3, Math.round(canvasHeight/4*3), 60, getRandomColor());
+    buttonArr.push(start3);
+    start3.draw();
+    size = 30;
+    ctx.font = 'bold ' + size + 'px monospace';
+    draw.text("MotioN", Math.round(canvasWidth/4*3-ctx.measureText("MotioN").width/2),  Math.round(canvasHeight/4*3+size/3), size, getRandomColor())
+    
+    return buttonArr;
+}
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -479,27 +504,37 @@ var wordArr = getWords();
 var answerArr = getAnswers();
 
 // gameScreen(wordArr, answerArr);
-var startButton = buildWelcomeScreen();
+var startButtons = buildWelcomeScreen();
+console.log(startButtons[1]);
 
 canvas.addEventListener("mouseup", onMouseClick, false);
 canvas.wordArr = wordArr;
 canvas.answerArr = answerArr;
 canvas.state = 1;
-canvas.startButton = startButton;
+canvas.startButtons = startButtons;
 
 /*Function for runtime loop*/
-// function loop(){
-//     if(canvas.state == 1){
+function loop(){
+    if(canvas.state == 1){
+        var size = 40;
+        ctx.font = 'bold ' + size + 'px monospace';
+        draw.text('Welcome!', Math.round(canvasWidth/2-ctx.measureText("Welcome!").width/2),  Math.round(canvasHeight/4), size,  getRandomColor());
+    }else if(canvas.state == 2){
+        /* Original game */
 
-//     }else if(canvas.state == 2){
-//         for(var i=1; i<allCircles.length; i++){
-//             allCircles[i].rePaint(getRandomColor());
-//         }
-//     }else{
+    }else if(canvas.state == 3){
+        allCircles[0].rePaint(allCircles[0].r++, allCircles[0].c);
+        for(var i=1; i<allCircles.length; i++){
+            allCircles[i].rePaint(allCircles[i].r++, getRandomColor());
+        }
+    }else{
+        var size = 40;
+        ctx.font = 'bold ' + size + 'px monospace';
+        draw.text('GAME OVER', Math.round(canvasWidth/2-ctx.measureText("GAME OVER").width/2),  Math.round(canvasHeight/4), size, getRandomColor());
 
-//     }
+    }
 
-// };
-// setInterval(loop, 500);
+};
+setInterval(loop, 500);
 
 }());

@@ -6,6 +6,7 @@ function readWords($fileName)
 	{
 		$string = file_get_contents($fileName);
 		$string = explode("\r\n", $string);
+		// $string = explode("\n", $string);
 		return json_encode($string);
 	}
 	else{
