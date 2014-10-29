@@ -187,7 +187,7 @@ function printWords(nrOfWords, wordArr, answer, circleArr){
     var printedWordArr = [];
 
     /*This should be the answer circle*/
-    var size = Math.floor(Math.random()*10+10);
+    var size = Math.floor(Math.random()*10+14);
     var pos = getTextPositionOutOfCircles(answer.answer, size, circleArr);
     var one = new textObj(answer.answer, pos.x, pos.y, size, answer.color);
     printedWordArr.push(one);
@@ -195,7 +195,7 @@ function printWords(nrOfWords, wordArr, answer, circleArr){
 
     for(var i=0; i<nrOfWords-1;i++){
         var word = wordArr[randList[i]];
-        var size = Math.floor(Math.random()*10+10);
+        var size = Math.floor((Math.random()*10)+15);
         var col = getRandomColor();
 
         var pos = getTextPosition(word, printedWordArr, size, circleArr);
@@ -271,7 +271,7 @@ function printCircles(nrOfCircles, answerColor){
 
 //////////////////////////// Intesect functions ////////////////////////////
 
-/*Check if text and circle intersact
+/*Check if text and circle intersect
 Return boolean
 */
 function text2CircleIntersection(x, y, word, size, circle){
@@ -370,7 +370,6 @@ function onMouseClick(event){
                 if(i==0){
                     /************** Score calculation  ************/
                     var elapsedTime = clock.getTime() - time;
-                    console.log(time, elapsedTime);
                     if(elapsedTime < 1000){
                         score += 6;
                     }else if(elapsedTime < 4000){
