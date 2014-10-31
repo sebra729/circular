@@ -158,8 +158,9 @@ function getTextPositionOutOfCircles(word, size, circleArr){
     return {x: x, y: y};
 }
 
-function getNewDirection(circle, rad){
-    var angle = circle.angle + Math.pow(-1,Math.round(Math.random()))*Math.PI/8;
+function getNewDirection(circle, rad, rotation){
+    var angle = circle.angle + rotation * Math.PI/8;
+    // var angle = circle.angle + Math.pow(-1,Math.round(Math.random()))*Math.PI/8;
     circle.angle = angle;
     dirX = Math.round(rad * Math.cos(angle));
     dirY = Math.round(rad * Math.sin(angle));
@@ -560,6 +561,7 @@ var counter = 1;
 var dirX = 0;
 var dirY = 0;
 var color = 'green';
+var dirCounter = 31;
 function loop(){
     if(canvas.state == 1){
         /* Welcome screen */
@@ -590,8 +592,21 @@ function loop(){
         // console.log(counter + " " + dirX + " " + dirY);
         /*if counter == 0, New derection for every circle*/
         if(counter == 0){
+            if(dirCounter<=31 && dirCounter > 16){
+                dirCounter--;     
+            }else if(dirCounter<16){
+                dirCounter++;
+            }else{
+                dirCounter = Math.round(Math.random()*31);
+            }
             for(var i=0; i<allCircles.length; i++){
-                var dir = getNewDirection(allCircles[i], 3);
+                if(dirCounter <= 41 && dirCounter > 16){
+                    var dir = getNewDirection(allCircles[i], 3, 1);    
+                }else if(dirCounter >= 0){
+                    var dir = getNewDirection(allCircles[i], 3, -1);
+                }
+                console.log(dirCounter);
+                // var dir = getNewDirection(allCircles[i], 3, false);
                 allCircles[i].direction(dir.x, dir.y);
                 moveCircle(allCircles[i], 3);
                 allCircles[i].rePaint(allCircles[i].r, allCircles[i].c);
