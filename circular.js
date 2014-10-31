@@ -48,20 +48,23 @@ function circleObj(x, y, r, c)
     this.y = y;
     this.r = r;
     this.c = c;
+    this.dirX = 0;
+    this.dirY = 0;
+    this.angle = Math.random()*2*Math.PI;
 
     this.draw = function(){
         draw.circle(this.x, this.y, this.r, this.c);
     };
-    this.position = function(x, y){
-        this.x = x;
-        this.y = y;
-    }
     this.rePaint = function(radius, color){
         draw.circle(this.x, this.y, radius, color);
     }
     this.move = function(x, y){
         this.x = x;
         this.y = y;
+    }
+    this.direction = function(dirX, dirY){
+        this.dirX = dirX;
+        this.dirY = dirY;
     }
 };
 
@@ -153,6 +156,26 @@ function getTextPositionOutOfCircles(word, size, circleArr){
         }
     }
     return {x: x, y: y};
+}
+
+function getNewDirection(circle, rad){
+    var angle = circle.angle + Math.pow(-1,Math.round(Math.random()))*Math.PI/4;
+    circle.angle = angle;
+    dirX = Math.round(rad * Math.cos(angle));
+    dirY = Math.round(rad * Math.sin(angle));
+    return {x: dirX, y: dirY};
+}
+
+function moveCircle(circle, rad){
+    if(circle.x+circle.dirX+circle.r >= canvasWidth || circle.x + circle.dirX-circle.r <= 0 ){
+        circle.direction(circle.dirX*-1, circle.dirY);
+        circle.angle = Math.acos(circle.dirX/rad);
+    }
+    if((circle.y + circle.dirY + circle.r) >= canvasHeight || (circle.y + circle.dirY - circle.r) <= 0){
+        circle.direction(circle.dirX, circle.dirY*-1);
+        circle.angle = Math.asin(circle.dirY/rad);
+    }
+    circle.move(circle.x + circle.dirX, circle.y + circle.dirY);
 }
 ////////////////////////////////////////////////////////////////////////
 
@@ -324,7 +347,7 @@ function circle2CircleIntersection(x, y, radius, otherCircle){
 }
 
 //////////////////////////// Event functions ////////////////////////////
-/*Get coordinates of the mause pointer at event
+/*Get coordinates of the mause pointer at an event
 Return: Boolean.
 http://miloq.blogspot.se/2011/05/coordinates-mouse-click-canvas.html*/
 function getPosition(event){
@@ -348,9 +371,10 @@ function getPosition(event){
 }
 
 /*Eventlistener for mouse click and state handeler
-State = 1 || 10: For welcome and game over screen
-State = 2: For Orgin Game
-State = 3: For Growing game
+State == 1 || 10: For welcome and game over screen
+State == 2: For OrgiN Game
+State == 3: For GroW Game
+State == 4: For MoviN Game
 */
 function onMouseClick(event){
 
@@ -368,19 +392,24 @@ function onMouseClick(event){
         
         for(var i=0;i<startButtons.length;i++){
             if (Math.pow(pos.x - startButtons[i].x, 2)+Math.pow(pos.y-startButtons[i].y,2)<Math.pow(startButtons[i].r,2)){
-                buildGameScene(event.target.wordArr, event.target.answerArr);
                 canvas.time = clock.getTime();
                 
                 switch(i){
                     case 0:
+                        /* Start OrgiN game */
+                        buildGameScene(event.target.wordArr, event.target.answerArr);
                         canvas.state = 2;
                         break;
                     case 1:
-                        frameFreq = setInterval(loop, 500);
+                        /* Start GroW game */
+                        buildGameScene(event.target.wordArr, event.target.answerArr);
+                        frameFreq = setInterval(loop, 100);
                         canvas.state = 3;
                         break;
                     case 2:
-                        frameFreq = setInterval(loop, 100);
+                        /* Start MoviN game*/
+                        buildGameScene(event.target.wordArr, event.target.answerArr);
+                        frameFreq = setInterval(loop, 1000/60 *2);
                         canvas.state = 4;
                         break;
                 }
@@ -408,7 +437,8 @@ function onMouseClick(event){
                     laps--;
                     if(laps == 0){
                         canvas.state = 10;
-                        canvas.frameFreq = setInterval(loop, 500);
+                        clearInterval(frameFreq);
+                        frameFreq = setInterval(loop, 500);
                         canvas.startButton = buildGameOverScreen();
                         break;    
                     }
@@ -529,40 +559,55 @@ frameFreq = setInterval(loop, 500);
 var counter = 1;
 var dirX = 0;
 var dirY = 0;
+var color = 'green';
 function loop(){
     if(canvas.state == 1){
+        /* Welcome screen */
         var size = 40;
         ctx.font = 'bold ' + size + 'px monospace';
         draw.text('Welcome!', Math.round(canvasWidth/2-ctx.measureText("Welcome!").width/2),  Math.round(canvasHeight/4), size,  getRandomColor());
     }else if(canvas.state == 2){
         /* Original game */
-
     }else if(canvas.state == 3){
+        /* Growing game */
         allCircles[0].rePaint(allCircles[0].r++, allCircles[0].c);
-        for(var i=1; i<allCircles.length; i++){
-            allCircles[i].rePaint(allCircles[i].r++, getRandomColor());
+        if(counter == 0){
+            for(var i=1; i<allCircles.length; i++){
+                allCircles[i].c = getRandomColor();
+                allCircles[i].rePaint(allCircles[i].r++, allCircles[i].c);
+            }
+            counter = Math.round(Math.random()*6);
+        }else{
+            for(var i=1; i<allCircles.length; i++){
+                allCircles[i].rePaint(allCircles[i].r++, allCircles[i].c);
+            }
+            counter--;
         }
     }else if(canvas.state == 4){
-        frameFrq = 100;
+        /* Moving game */
         counter--;
+        draw.clear();
+        // console.log(counter + " " + dirX + " " + dirY);
+        /*if counter == 0, New derection for every circle*/
         if(counter == 0){
-            dirX = Math.round(Math.random()*2)-1;
-            dirY = Math.round(Math.random()*2)-1;
-            counter = 4;
-        }
-        console.log(counter + " " + dirX + " " + dirY);
-        for(var i=0; i<allCircles.length; i++){
-            allCircles[i].rePaint(allCircles[i].r, 'white');
-            var x = allCircles[i].x + dirX*2;
-            var y = allCircles[i].y + dirY*2;
-            allCircles[i].move(x, y);
-            allCircles[i].rePaint(allCircles[i].r, allCircles[i].c);
+            for(var i=0; i<allCircles.length; i++){
+                var dir = getNewDirection(allCircles[i], 3);
+                allCircles[i].direction(dir.x, dir.y);
+                moveCircle(allCircles[i], 3);
+                allCircles[i].rePaint(allCircles[i].r, allCircles[i].c);
+            }
+            counter = Math.round(Math.random()*10)+4;
+        }else{
+            for(var i=0;i<allCircles.length;i++){
+                moveCircle(allCircles[i], 3);
+                allCircles[i].rePaint(allCircles[i].r, allCircles[i].c);
+            }
         }
     }else{
+        /* Game over screen */
         var size = 40;
         ctx.font = 'bold ' + size + 'px monospace';
         draw.text('GAME OVER', Math.round(canvasWidth/2-ctx.measureText("GAME OVER").width/2),  Math.round(canvasHeight/4), size, getRandomColor());
-
     }
 
 };
