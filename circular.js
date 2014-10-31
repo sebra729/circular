@@ -159,7 +159,7 @@ function getTextPositionOutOfCircles(word, size, circleArr){
 }
 
 function getNewDirection(circle, rad){
-    var angle = circle.angle + Math.pow(-1,Math.round(Math.random()))*Math.PI/4;
+    var angle = circle.angle + Math.pow(-1,Math.round(Math.random()))*Math.PI/8;
     circle.angle = angle;
     dirX = Math.round(rad * Math.cos(angle));
     dirY = Math.round(rad * Math.sin(angle));
@@ -409,7 +409,7 @@ function onMouseClick(event){
                     case 2:
                         /* Start MoviN game*/
                         buildGameScene(event.target.wordArr, event.target.answerArr);
-                        frameFreq = setInterval(loop, 1000/60 *2);
+                        frameFreq = setInterval(loop, 1000/60*2);
                         canvas.state = 4;
                         break;
                 }
@@ -596,7 +596,7 @@ function loop(){
                 moveCircle(allCircles[i], 3);
                 allCircles[i].rePaint(allCircles[i].r, allCircles[i].c);
             }
-            counter = Math.round(Math.random()*10)+4;
+            counter = Math.round(Math.random()*5)+4;
         }else{
             for(var i=0;i<allCircles.length;i++){
                 moveCircle(allCircles[i], 3);
