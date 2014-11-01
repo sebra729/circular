@@ -2,14 +2,20 @@
     var canvas = document.getElementById('gameCanvas'),
         ctx = canvas.getContext('2d'),
         score = 0,
-		canvasWidth = 500,
-        canvasHeight = 400,
+        /*Canvas width and hight -15 to avoid scroll bar*/
+        canvasWidth = window.innerWidth-15,
+        canvasHeight = window.innerHeight-15,
         highScore = 20,
         laps=5,
         leftButton = document.getElementById('leftButton'),
         rightButton = document.getElementById('rightButton');
 
-
+/*If screen size >= 600px limit screen size,
+else same as device screen size*/
+if(canvasWidth >= 585){
+     canvasWidth = 600;
+     canvasHeight= 374; 
+}
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
@@ -471,10 +477,9 @@ Chooses randomly which answer to print*/
 function buildGameScene(wordArr, answerArr){
     draw.clear();
 
-    draw.text('Score: '+score, 0, 12, 12, 'black');
-
     //allCircles global array containg all printed circles.
     if(canvas.state == 2 || canvas.state == 3){
+        draw.text('Score: '+score, 0, 12, 12, 'black');
         if(answerArr.length >0){
             var rand = Math.floor(Math.random()*answerArr.length);
             allCircles = printCircles(10, answerArr[rand].color);
@@ -603,6 +608,7 @@ function loop(){
         /* Moving game */
         counter--;
         draw.clear();
+        draw.text('Score: '+score, 0, 12, 12, 'black');
         /*if counter == 0, New derection for every circle*/
         if(counter == 0){
             for(var i=0; i<allCircles.length; i++){
@@ -618,7 +624,7 @@ function loop(){
                 allCircles[i].rePaint(allCircles[i].r, allCircles[i].c);
             }
         }
-        draw.text(answer.answer, canvasWidth/2,canvasHeight, 12, answer.color);
+        draw.text(answer.answer, canvasWidth/2-ctx.measureText(answer.answer).width/2,canvasHeight, 12, answer.color);
     }else{
         /* Game over screen */
         var size = 40;
