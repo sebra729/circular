@@ -158,6 +158,12 @@ function getTextPositionOutOfCircles(word, size, circleArr){
     return {x: x, y: y};
 }
 
+/*Get new direction vector for a circle
+The direction angle is randomly increased 
+or decreased by PI/8
+Params: circle: the circleObj for new direction
+        rad: the directon vector lenght
+Return: the new direction i x & y-axis*/
 function getNewDirection(circle, rad){
     var angle = circle.angle + Math.pow(-1,Math.round(Math.random()))*Math.PI/8;
     circle.angle = angle;
@@ -166,6 +172,11 @@ function getNewDirection(circle, rad){
     return {x: dirX, y: dirY};
 }
 
+/*Move a cicle in its direction. 
+Checks for wall collision and changes the 
+circles direction if it collides with a wall
+Params: circle: circleObj that are to be moved 
+        rad: lenght of direction vector*/
 function moveCircle(circle, rad){
     if(circle.x+circle.dirX+circle.r >= canvasWidth || circle.x + circle.dirX-circle.r <= 0 ){
         circle.direction(circle.dirX*-1, circle.dirY);
@@ -393,27 +404,23 @@ function onMouseClick(event){
         for(var i=0;i<startButtons.length;i++){
             if (Math.pow(pos.x - startButtons[i].x, 2)+Math.pow(pos.y-startButtons[i].y,2)<Math.pow(startButtons[i].r,2)){
                 canvas.time = clock.getTime();
-                
                 switch(i){
                     case 0:
                         /* Start OrgiN game */
-                        buildGameScene(event.target.wordArr, event.target.answerArr);
                         canvas.state = 2;
                         break;
                     case 1:
                         /* Start GroW game */
-                        buildGameScene(event.target.wordArr, event.target.answerArr);
                         frameFreq = setInterval(loop, 100);
                         canvas.state = 3;
                         break;
                     case 2:
                         /* Start MoviN game*/
-                        buildGameScene(event.target.wordArr, event.target.answerArr);
-                        frameFreq = setInterval(loop, 1000/60*2);
+                        frameFreq = setInterval(loop, 1000/60);
                         canvas.state = 4;
                         break;
                 }
-                // break;
+                buildGameScene(event.target.wordArr, event.target.answerArr);
             }
         }
     }else if(state == 2 || state == 3 || state == 4){
@@ -452,8 +459,7 @@ function onMouseClick(event){
                 }
             }
         }
-    }
-    
+    }   
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -468,14 +474,24 @@ function buildGameScene(wordArr, answerArr){
     draw.text('Score: '+score, 0, 12, 12, 'black');
 
     //allCircles global array containg all printed circles.
-    if(answerArr.length >0){
-        var rand = Math.floor(Math.random()*answerArr.length);
-        allCircles = printCircles(10, answerArr[rand].color);
-        var printedWordArr = printWords(10, wordArr, answerArr[rand], allCircles);
-    }else{
-        allCircles = printCircles(5, answerArr.color);
-        var printedWordArr = printWords(5, wordArr, answerArr, allCircles);
-    }
+    if(canvas.state == 2 || canvas.state == 3){
+        if(answerArr.length >0){
+            var rand = Math.floor(Math.random()*answerArr.length);
+            allCircles = printCircles(10, answerArr[rand].color);
+            var printedWordArr = printWords(10, wordArr, answerArr[rand], allCircles);
+        }else{
+            allCircles = printCircles(5, answerArr.color);
+            var printedWordArr = printWords(5, wordArr, answerArr, allCircles);
+        }
+    }else if(canvas.state == 4){
+        if(answerArr.length >0){
+            var rand = Math.floor(Math.random()*answerArr.length);
+            allCircles = printCircles(10, answerArr[rand].color);
+            answer = answerArr[rand];
+        }else{
+            allCircles = printCircles(5, answerArr.color);
+        }
+    }  
 }
 
 /*Builds the welcome screen
@@ -587,7 +603,6 @@ function loop(){
         /* Moving game */
         counter--;
         draw.clear();
-        // console.log(counter + " " + dirX + " " + dirY);
         /*if counter == 0, New derection for every circle*/
         if(counter == 0){
             for(var i=0; i<allCircles.length; i++){
@@ -603,6 +618,7 @@ function loop(){
                 allCircles[i].rePaint(allCircles[i].r, allCircles[i].c);
             }
         }
+        draw.text(answer.answer, canvasWidth/2,canvasHeight, 12, answer.color);
     }else{
         /* Game over screen */
         var size = 40;
