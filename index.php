@@ -33,7 +33,7 @@
 </div>
 
 <head>
-  <title>Cirular</title>
+  <title>Circular</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=400, height=400, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
