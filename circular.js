@@ -404,7 +404,7 @@ function onMouseClick(event){
         var startButtons = event.target.startButtons;
         
         /*      Clear the update frequence for loop      */
-        clearInterval(frameFreq)
+        clearInterval(frameFreq);
         /*************************************************/
         
         for(var i=0;i<startButtons.length;i++){
@@ -417,11 +417,13 @@ function onMouseClick(event){
                         break;
                     case 1:
                         /* Start GroW game */
+                        counter = 1
                         frameFreq = setInterval(loop, 100);
                         canvas.state = 3;
                         break;
                     case 2:
                         /* Start MoviN game*/
+                        counter = 1;
                         frameFreq = setInterval(loop, 1000/60);
                         canvas.state = 4;
                         break;
@@ -455,11 +457,11 @@ function onMouseClick(event){
                         canvas.startButton = buildGameOverScreen();
                         break;    
                     }
-
                     canvas.time = clock.getTime();
                     buildGameScene(event.target.wordArr, event.target.answerArr);
                     break;
                 }else{
+                    console.log(laps);
                     draw.circle(allCircles[i].x, allCircles[i].y, allCircles[i].r-1, 'white');
                     score -= 1;
                 }
@@ -615,6 +617,7 @@ function loop(){
         counter--;
         draw.clear();
         draw.text('Score: '+score, 0, 12, 12, 'black');
+        // console.log(frameFreq + " " + counter);
         /*if counter == 0, New derection for every circle*/
         if(counter == 0){
             for(var i=0; i<allCircles.length; i++){
