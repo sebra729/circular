@@ -440,7 +440,7 @@ function onMouseClick(event){
                         score +=1;
                     }
                     /***********************************************/
-
+                    canvas.successSound.play();
                     laps--;
                     if(laps == 0){
                         canvas.state = 10;
@@ -453,7 +453,7 @@ function onMouseClick(event){
                     buildGameScene(event.target.wordArr, event.target.answerArr);
                     break;
                 }else{
-                    console.log(laps);
+                    canvas.failSound.play();
                     draw.circle(allCircles[i].x, allCircles[i].y, allCircles[i].r-1, 'white');
                     score -= 1;
                 }
@@ -574,6 +574,8 @@ canvas.wordArr = wordArr;
 canvas.answerArr = answerArr;
 canvas.state = 1;
 canvas.startButtons = startButtons;
+canvas.successSound = new Audio("sound/146718__fins__button.wav");
+canvas.failSound = new Audio("sound/707__vitriolix__subbasesoft.wav");
 frameFreq = setInterval(loop, 500);
 
 /*Function for runtime loop*/
