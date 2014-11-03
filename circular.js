@@ -16,8 +16,8 @@ if(canvasWidth >= 585){
      canvasWidth = 600;
      canvasHeight= 374; 
 }
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+canvas.width = canvasWidth;
+canvas.height = canvasHeight;
 
 var draw = {
 
@@ -168,8 +168,8 @@ function getTextPositionOutOfCircles(word, size, circleArr){
 The direction angle is randomly increased 
 or decreased by PI/8
 Params: circle: the circleObj for new direction
-        rad: the directon vector lenght
-Return: the new direction i x & y-axis*/
+        rad: the direction vector length
+Return: the new direction in x & y-axis*/
 function getNewDirection(circle, rad){
     var angle = circle.angle + Math.pow(-1,Math.round(Math.random()))*Math.PI/8;
     circle.angle = angle;
@@ -178,11 +178,11 @@ function getNewDirection(circle, rad){
     return {x: dirX, y: dirY};
 }
 
-/*Move a cicle in its direction. 
+/*Move a circle in it's direction. 
 Checks for wall collision and changes the 
 circles direction if it collides with a wall
 Params: circle: circleObj that are to be moved 
-        rad: lenght of direction vector*/
+        rad: length of direction vector*/
 function moveCircle(circle, rad){
     if(circle.x+circle.dirX+circle.r >= canvasWidth || circle.x + circle.dirX-circle.r <= 0 ){
         circle.direction(circle.dirX*-1, circle.dirY);
@@ -202,8 +202,6 @@ Return: Array with all words*/
 function getWords(){
     var div = document.getElementById("dom-words");
     var wordArr = JSON.parse(div.textContent);
-    // console.log(wordArr[0]);
-    // console.log(value = "Word list length "+ wordArr.length);
     return wordArr;
 };
 
@@ -212,8 +210,6 @@ Return: Array with answers*/
 function getAnswers(){
     var div = document.getElementById("dom-answers");
     var answerArr = JSON.parse(div.textContent);
-    // console.log(answerArr);
-    // console.log(value = "Word list length "+ answerArr.length);
     return answerArr;
 }
 
@@ -223,9 +219,10 @@ function getAnswers(){
 /*Print out the words 
 Checks for intersaction with circles and other text
 Params: nrOfWords, the number of word to be visable. 
-wordArr, array with words. 
-answer, the anwer ext and color. 
-circleArr array with reference to the circles*/
+        wordArr, array with words. 
+        answer, the anwer text and color. 
+        circleArr, array with reference to the circles
+Return: Array of textObj*/
 function printWords(nrOfWords, wordArr, answer, circleArr){
     var randList = getRandomList(wordArr.length);
     var printedWordArr = [];
@@ -254,26 +251,26 @@ function printWords(nrOfWords, wordArr, answer, circleArr){
 
 /*Print out circles witout overlaping circles
 return array with reference to the circles.
-Params: nrOfCircles number of circles that are to be printed*/
+Params: nrOfCircles number of circles that are to be printed
+        answerColor, the color of the answer circle*/
 function printCircles(nrOfCircles, answerColor){
     var circleFactor  = 4;
     var circleArr = [];
 
-    //answer circle;
+    /**********The answer circle***********/
     var radius = Math.floor(Math.random()*6)*2*circleFactor+4*circleFactor;
     var x = Math.floor(Math.random()*(canvasWidth-2*radius)+radius);
     var y = Math.floor(Math.random()*(canvasHeight-2*radius)+radius);
-
     var c = new circleObj(x, y, radius, answerColor);
     circleArr.push(c);
     c.draw();
-
+    /*************************************/
     for(var i=0; i<nrOfCircles-1; i++){
         radius = Math.floor(Math.random()*6)*2*circleFactor+4*circleFactor;
         x = Math.floor(Math.random()*(canvasWidth-2*radius)+radius);
         y = Math.floor(Math.random()*(canvasHeight-2*radius)+radius);
         
-        /*Keeps the color of the answere unique*/
+        /*Keeps the color of the answer unique*/
         while(true){
             var col = getRandomColor();
             var stop = 0;
@@ -285,28 +282,24 @@ function printCircles(nrOfCircles, answerColor){
             stop++;
         }
 
-        while(true){
-            var stop = 0;
-            for(var j=0;j<circleArr.length;j++){
-                if(circle2CircleIntersection(x, y, radius, circleArr[j])){
-                    //Circle intersect 
-                    // console.log("collision circle2circle");
-                    x = Math.floor(Math.random()*(canvasWidth-2*radius)+radius);
-                    y = Math.floor(Math.random()*(canvasHeight-2*radius)+radius);
-                    // To get j back to 0 if collision.
-                    j = -1;
-                    stop ++;
-                }
-                if(stop >= 50){
-                    break;
-                }
+        var stop = 0;
+        for(var j=0;j<circleArr.length;j++){
+            if(circle2CircleIntersection(x, y, radius, circleArr[j])){
+                //Circle intersect 
+                x = Math.floor(Math.random()*(canvasWidth-2*radius)+radius);
+                y = Math.floor(Math.random()*(canvasHeight-2*radius)+radius);
+                // To get j back to 0 if collision.
+                j = -1;
+                stop ++;
             }
-            //new circle
-            var circle = new circleObj(x, y, radius, col);
-            circleArr.push(circle);
-            circle.draw();
-            break;
-        }        
+            if(stop >= 50){
+                break;
+            }
+        }
+        //new circle
+        var circle = new circleObj(x, y, radius, col);
+        circleArr.push(circle);
+        circle.draw();     
     }
     return circleArr;
 }
@@ -342,7 +335,6 @@ function text2TextIntesecton(x, y, size, word, otherWord){
     var wordHight = size;
     var otherWordWidth = Math.round(ctx.measureText(otherWord.word).width+otherWord.size);
     var otherWordHight = otherWord.size;
-    // console.log((x+wordWidth)+otherWord.x + (otherWord.x+otherWordWidth)+x + y+(otherWord.y+otherWord.size) + otherWord.y+(y+size));
     if((x+wordWidth)<otherWord.x || (otherWord.x+otherWordWidth)<x || y<(otherWord.y-otherWord.size) || otherWord.y<(y-size)){
         return false;
     }
@@ -586,8 +578,6 @@ frameFreq = setInterval(loop, 500);
 
 /*Function for runtime loop*/
 var counter = 1;
-var dirX = 0;
-var dirY = 0;
 var color = 'green';
 function loop(){
     if(canvas.state == 1){
@@ -617,7 +607,6 @@ function loop(){
         counter--;
         draw.clear();
         draw.text('Score: '+score, 0, 12, 12, 'black');
-        // console.log(frameFreq + " " + counter);
         /*if counter == 0, New derection for every circle*/
         if(counter == 0){
             for(var i=0; i<allCircles.length; i++){
